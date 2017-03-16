@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,51 +17,93 @@ namespace DuplicateFinder.Forms
 {
     public partial class DuplicateFinderForm : Form
     {
-        private IntPtr _sysImageList = IntPtr.Zero;
-
         public DuplicateFinderForm()
         {
             InitializeComponent();
-            
+            DirectoriesListView_SelectedIndexChanged(this, EventArgs.Empty);
         }
-        
-        private void button1_Click(object sender, EventArgs e)
+
+        private void OpenDirectory()
         {
-            AddFile(@"D:\Pictures");
-            /*
-            using (var ofd = new OpenFileDialog())
+            var selectedItems = _directoriesListView.SelectedItems;
+
+            if (selectedItems.Count != 1)
+                return;
+
+            var dir = (DirectoryInfo)selectedItems[0].Tag;
+
+            using (Process.Start(dir.FullName))
             {
-                if (ofd.ShowDialog() == DialogResult.OK)
+            }
+        }
+
+        private void RemoveSelectedDirectories()
+        {
+            var selectedItems = _directoriesListView.SelectedIndices;
+
+            for (var i = selectedItems.Count - 1; i >= 0; i--)
+                _directoriesListView.Items.RemoveAt(selectedItems[i]);
+
+            _findButton.Enabled = _directoriesListView.Items.Count > 0;
+        }
+
+        private void DirectoriesListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _removeButton.Enabled = _directoriesListView.SelectedItems.Count > 0;
+        }
+
+        private void DirectoriesListView_ItemActivate(object sender, EventArgs e)
+        {
+            OpenDirectory();
+        }
+
+        private void DirectoriesListView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            switch (e.KeyData)
+            {
+                case Keys.Enter:
+                    OpenDirectory();
+                    break;
+                case Keys.Delete:
+                    RemoveSelectedDirectories();
+                    break;
+            }
+        }
+
+        private void AddButton_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                if (fbd.ShowDialog() != DialogResult.OK)
+                    return;
+
+                var dir = new DirectoryInfo(fbd.SelectedPath);
+                var lvi = new ListViewItem(new[] { dir.Name, dir.FullName }, 0)
                 {
-                    AddFile(ofd.FileName);
-                }
-            }*/
+                    Tag = dir
+                };
+
+                _directoriesListView.Items.Add(lvi);
+                _findButton.Enabled = true;
+            }
         }
 
-        private void AddFile(string path)
+        private void RemoveButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(_directoriesListView.IsHandleCreated);
-
-            var sfi = default(SHFILEINFO);
-            var sysImageList = SHGetFileInfo(path, 0, ref sfi, (uint)Marshal.SizeOf<SHFILEINFO>(), SHGFI_DISPLAYNAME | SHGFI_SYSICONINDEX);
-
-            if (sysImageList == IntPtr.Zero)
-            {
-                // uh oh
-            }
-            else if (_sysImageList != sysImageList)
-            {
-                var oldImageList = SendMessage(_directoriesListView.Handle, LVM_SETIMAGELIST, new IntPtr(LVSIL_SMALL), sysImageList);
-                Debug.Assert(oldImageList == IntPtr.Zero);
-                _sysImageList = sysImageList;
-            }
-
-            _directoriesListView.Items.Add(sfi.szDisplayName, sfi.iIcon);
+            RemoveSelectedDirectories();
         }
 
-        private void DuplicateFinderForm_Load(object sender, EventArgs e)
+        private void FindButton_Click(object sender, EventArgs e)
         {
+            var dirs = _directoriesListView.Items.Cast<ListViewItem>().Select(x => (DirectoryInfo)x.Tag).ToArray();
 
+            using (var duplicatesForm = new DuplicatesForm(dirs))
+                duplicatesForm.ShowDialog();
+        }
+
+        private void AboutButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Made by Aron Parker", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

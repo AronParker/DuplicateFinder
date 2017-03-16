@@ -17,6 +17,16 @@
             {
                 components.Dispose();
             }
+            if (_sysImageList != System.IntPtr.Zero)
+            {
+                System.Diagnostics.Debug.Assert(_duplicatesListView.IsHandleCreated);
+                var sysImageList = NativeMethods.SendMessage(_duplicatesListView.Handle,
+                                                             NativeMethods.LVM_SETIMAGELIST,
+                                                             new System.IntPtr(NativeMethods.LVSIL_SMALL),
+                                                             System.IntPtr.Zero);
+
+                System.Diagnostics.Debug.Assert(sysImageList == _sysImageList);
+            }
             base.Dispose(disposing);
         }
 
