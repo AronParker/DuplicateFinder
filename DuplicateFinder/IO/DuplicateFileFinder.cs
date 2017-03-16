@@ -14,26 +14,14 @@ namespace DuplicateFinder.IO
         private List<FileInfo> _files = new List<FileInfo>();
         private CancellationToken _token;
         private Task _task;
-        private int _state;
-
-        public event EventHandler StateChanged;
+        
         public event FileInfoEventHandler FileAdded;
+        public event EventHandler ProcessingStarted;
         public event FileInfoEnumerableEventHandler FilesProcessed;
         public event FileInfoEnumerableEventHandler DuplicateFound;
         public event ErrorEventHandler Error;
 
         public bool IsRunning => _task != null && !_task.IsCompleted;
-
-        public DuplicateFileFinderState State
-        {
-            get => (DuplicateFileFinderState)Volatile.Read(ref _state);
-            set
-            {
-                Volatile.Write(ref _state, (int)value);
-
-                StateChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
 
         public Task RunAsync(IEnumerable<DirectoryInfo> dirs, IFileInfoEqualityComparer fileInfoComparer)
         {
@@ -77,25 +65,15 @@ namespace DuplicateFinder.IO
 
         private void InternalStart(IEnumerable<DirectoryInfo> dirs, IFileInfoEqualityComparer fileComparer)
         {
-            try
-            {
-                State = DuplicateFileFinderState.FindingDuplicates;
-                new FileInfoEnumerator(this).AddDirectories(dirs);
-
-                State = DuplicateFileFinderState.SortingFiles;
-                _files.Sort((x, y) => y.Length.CompareTo(x.Length));
-
-                State = DuplicateFileFinderState.FindingDuplicates;
-                FindDuplicates(fileComparer);
-            }
-            finally
-            {
-                State = DuplicateFileFinderState.Idle;
-            }
+            new FileInfoEnumerator(this).AddDirectories(dirs);
+            ProcessingStarted?.Invoke(this, EventArgs.Empty);
+            FindDuplicates(fileComparer);
         }
 
         private void FindDuplicates(IFileInfoEqualityComparer fileComparer)
         {
+            _files.Sort((x, y) => y.Length.CompareTo(x.Length));
+
             var i = 0;
 
             while (i < _files.Count)

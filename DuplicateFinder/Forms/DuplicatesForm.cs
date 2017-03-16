@@ -17,20 +17,25 @@ namespace DuplicateFinder.Forms
     public partial class DuplicatesForm : Form
     {
         private DirectoryInfo[] _dirs;
+        private bool _quickScan;
 
         private IntPtr _sysImageList = IntPtr.Zero;
 
-        public DuplicatesForm()
-        {
-            InitializeComponent();
-        }
-
-        public DuplicatesForm(DirectoryInfo[] dirs)
+        
+        public DuplicatesForm(DirectoryInfo[] dirs, bool quickScan)
         {
             if (dirs == null)
                 throw new ArgumentNullException(nameof(dirs));
 
             _dirs = dirs;
+            _quickScan = quickScan;
+
+            InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+
         }
 
         private void AddFile(string path)
@@ -38,7 +43,7 @@ namespace DuplicateFinder.Forms
             Debug.Assert(_duplicatesListView.IsHandleCreated);
 
             var sfi = default(SHFILEINFO);
-            var sysImageList = SHGetFileInfo(path, 0, ref sfi, (uint)Marshal.SizeOf<SHFILEINFO>(), SHGFI_DISPLAYNAME | SHGFI_SYSICONINDEX);
+            var sysImageList = SHGetFileInfo(path, 0, ref sfi, (uint)Marshal.SizeOf<SHFILEINFO>(), SHGFI_DISPLAYNAME | SHGFI_TYPENAME | SHGFI_SYSICONINDEX);
 
             if (sysImageList == IntPtr.Zero)
             {

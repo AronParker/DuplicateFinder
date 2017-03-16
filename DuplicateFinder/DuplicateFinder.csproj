@@ -72,7 +72,6 @@
     </Compile>
     <Compile Include="IO\DirectoryException.cs" />
     <Compile Include="IO\DuplicateFileFinder.cs" />
-    <Compile Include="IO\DuplicateFileFinderState.cs" />
     <Compile Include="IO\FileEqualityComparers\DefaultFileEqualityComparer.cs" />
     <Compile Include="IO\FileEqualityComparers\DefaultFileInfoEqualityComparer.cs" />
     <Compile Include="IO\FileEqualityComparers\FATFileEqualityComparer.cs" />

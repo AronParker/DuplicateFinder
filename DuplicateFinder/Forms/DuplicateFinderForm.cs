@@ -23,18 +23,16 @@ namespace DuplicateFinder.Forms
             DirectoriesListView_SelectedIndexChanged(this, EventArgs.Empty);
         }
 
-        private void OpenDirectory()
+        private void AddPath(string path)
         {
-            var selectedItems = _directoriesListView.SelectedItems;
-
-            if (selectedItems.Count != 1)
-                return;
-
-            var dir = (DirectoryInfo)selectedItems[0].Tag;
-
-            using (Process.Start(dir.FullName))
+            var dir = new DirectoryInfo(path);
+            var lvi = new ListViewItem(new[] { dir.Name, dir.FullName }, 0)
             {
-            }
+                Tag = dir
+            };
+
+            _directoriesListView.Items.Add(lvi);
+            _findButton.Enabled = true;
         }
 
         private void RemoveSelectedDirectories()
@@ -54,20 +52,22 @@ namespace DuplicateFinder.Forms
 
         private void DirectoriesListView_ItemActivate(object sender, EventArgs e)
         {
-            OpenDirectory();
+            var selectedItems = _directoriesListView.SelectedItems;
+
+            if (selectedItems.Count != 1)
+                return;
+
+            var dir = (DirectoryInfo)selectedItems[0].Tag;
+
+            using (Process.Start(dir.FullName))
+            {
+            }
         }
 
         private void DirectoriesListView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            switch (e.KeyData)
-            {
-                case Keys.Enter:
-                    OpenDirectory();
-                    break;
-                case Keys.Delete:
-                    RemoveSelectedDirectories();
-                    break;
-            }
+            if (e.KeyData == Keys.Delete)
+                RemoveSelectedDirectories();
         }
 
         private void AddButton_Click(object sender, EventArgs e)
@@ -77,14 +77,7 @@ namespace DuplicateFinder.Forms
                 if (fbd.ShowDialog() != DialogResult.OK)
                     return;
 
-                var dir = new DirectoryInfo(fbd.SelectedPath);
-                var lvi = new ListViewItem(new[] { dir.Name, dir.FullName }, 0)
-                {
-                    Tag = dir
-                };
-
-                _directoriesListView.Items.Add(lvi);
-                _findButton.Enabled = true;
+                AddPath(fbd.SelectedPath);
             }
         }
 
@@ -97,7 +90,7 @@ namespace DuplicateFinder.Forms
         {
             var dirs = _directoriesListView.Items.Cast<ListViewItem>().Select(x => (DirectoryInfo)x.Tag).ToArray();
 
-            using (var duplicatesForm = new DuplicatesForm(dirs))
+            using (var duplicatesForm = new DuplicatesForm(dirs, _quickScanCheckBox.Checked))
                 duplicatesForm.ShowDialog();
         }
 

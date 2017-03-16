@@ -35,6 +35,7 @@
             this._directoryPathColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._imageList = new System.Windows.Forms.ImageList(this.components);
             this._footerPanel = new System.Windows.Forms.Panel();
+            this._quickScanCheckBox = new System.Windows.Forms.CheckBox();
             this._aboutButton = new System.Windows.Forms.Button();
             this._findButton = new System.Windows.Forms.Button();
             this._removeButton = new System.Windows.Forms.Button();
@@ -84,13 +85,23 @@
             // 
             this._footerPanel.BackColor = System.Drawing.SystemColors.Control;
             this._footerPanel.CausesValidation = false;
+            this._footerPanel.Controls.Add(this._quickScanCheckBox);
             this._footerPanel.Controls.Add(this._aboutButton);
             this._footerPanel.Controls.Add(this._findButton);
             this._footerPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this._footerPanel.Location = new System.Drawing.Point(0, 211);
             this._footerPanel.Name = "_footerPanel";
             this._footerPanel.Size = new System.Drawing.Size(584, 50);
-            this._footerPanel.TabIndex = 5;
+            this._footerPanel.TabIndex = 3;
+            // 
+            // _quickScanCheckBox
+            // 
+            this._quickScanCheckBox.Location = new System.Drawing.Point(12, 12);
+            this._quickScanCheckBox.Name = "_quickScanCheckBox";
+            this._quickScanCheckBox.Size = new System.Drawing.Size(308, 26);
+            this._quickScanCheckBox.TabIndex = 2;
+            this._quickScanCheckBox.Text = "Quick scan";
+            this._quickScanCheckBox.UseVisualStyleBackColor = true;
             // 
             // _aboutButton
             // 
@@ -130,7 +141,7 @@
             this._removeButton.Location = new System.Drawing.Point(452, 58);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(120, 40);
-            this._removeButton.TabIndex = 3;
+            this._removeButton.TabIndex = 2;
             this._removeButton.Text = "Remove directory";
             this._removeButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this._removeButton.UseVisualStyleBackColor = true;
@@ -152,7 +163,6 @@
             // 
             // DuplicateFinderForm
             // 
-            this.AcceptButton = this._findButton;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.CausesValidation = false;
@@ -182,5 +192,6 @@
         private System.Windows.Forms.Panel _footerPanel;
         private System.Windows.Forms.Button _aboutButton;
         private System.Windows.Forms.Button _findButton;
+        private System.Windows.Forms.CheckBox _quickScanCheckBox;
     }
 }
