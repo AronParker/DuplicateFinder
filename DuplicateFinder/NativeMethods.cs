@@ -7,8 +7,9 @@ namespace DuplicateFinder
     [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods
     {
-        public const uint SHGFI_DISPLAYNAME = 0x000000200;
-        public const uint SHGFI_SYSICONINDEX = 0x000004000;
+        public const uint SHGFI_DISPLAYNAME = 0x00000200;
+        public const uint SHGFI_TYPENAME = 0x00000400;
+        public const uint SHGFI_SYSICONINDEX = 0x00004000;
 
         public const uint LVM_SETIMAGELIST = 0x1003;
         public const int LVSIL_SMALL = 1;

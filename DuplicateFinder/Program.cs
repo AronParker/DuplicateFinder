@@ -11,7 +11,7 @@ namespace DuplicateFinder
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DuplicateFinderForm());
+            Application.Run(new DuplicatesForm());
         }
     }
 }

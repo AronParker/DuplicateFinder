@@ -100,7 +100,7 @@
             this._footerPanel.Location = new System.Drawing.Point(0, 311);
             this._footerPanel.Name = "_footerPanel";
             this._footerPanel.Size = new System.Drawing.Size(584, 50);
-            this._footerPanel.TabIndex = 2;
+            this._footerPanel.TabIndex = 5;
             // 
             // _aboutButton
             // 
@@ -137,7 +137,7 @@
             this._exploreButton.Location = new System.Drawing.Point(452, 152);
             this._exploreButton.Name = "_exploreButton";
             this._exploreButton.Size = new System.Drawing.Size(120, 40);
-            this._exploreButton.TabIndex = 1;
+            this._exploreButton.TabIndex = 4;
             this._exploreButton.Text = "Explore directory";
             this._exploreButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this._exploreButton.UseVisualStyleBackColor = true;
@@ -150,7 +150,7 @@
             this._removeButton.Location = new System.Drawing.Point(452, 106);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(120, 40);
-            this._removeButton.TabIndex = 1;
+            this._removeButton.TabIndex = 3;
             this._removeButton.Text = "Remove directory";
             this._removeButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this._removeButton.UseVisualStyleBackColor = true;
@@ -163,7 +163,7 @@
             this._editButton.Location = new System.Drawing.Point(452, 60);
             this._editButton.Name = "_editButton";
             this._editButton.Size = new System.Drawing.Size(120, 40);
-            this._editButton.TabIndex = 1;
+            this._editButton.TabIndex = 2;
             this._editButton.Text = "Edit directory";
             this._editButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this._editButton.UseVisualStyleBackColor = true;

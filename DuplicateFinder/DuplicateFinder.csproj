@@ -64,6 +64,12 @@
     <Compile Include="Forms\DuplicateFinderForm.Designer.cs">
       <DependentUpon>DuplicateFinderForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\DuplicatesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DuplicatesForm.Designer.cs">
+      <DependentUpon>DuplicatesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="IO\DirectoryException.cs" />
     <Compile Include="IO\DuplicateFileFinder.cs" />
     <Compile Include="IO\DuplicateFileFinderState.cs" />
@@ -83,6 +89,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\DuplicateFinderForm.resx">
       <DependentUpon>DuplicateFinderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DuplicatesForm.resx">
+      <DependentUpon>DuplicatesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
