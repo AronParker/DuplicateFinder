@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +31,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>folder_explore.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,12 +52,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\ExplorerListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\IListEx.cs" />
     <Compile Include="Extensions\StreamEx.cs" />
     <Compile Include="Extensions\TimeSpanEx.cs" />
+    <Compile Include="Forms\DuplicateFinderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DuplicateFinderForm.Designer.cs">
+      <DependentUpon>DuplicateFinderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="IO\DirectoryException.cs" />
-    <Compile Include="IO\DuplicateFinder.cs" />
-    <Compile Include="IO\DuplicateFinderState.cs" />
+    <Compile Include="IO\DuplicateFileFinder.cs" />
+    <Compile Include="IO\DuplicateFileFinderState.cs" />
     <Compile Include="IO\FileEqualityComparers\DefaultFileEqualityComparer.cs" />
     <Compile Include="IO\FileEqualityComparers\DefaultFileInfoEqualityComparer.cs" />
     <Compile Include="IO\FileEqualityComparers\FATFileEqualityComparer.cs" />
@@ -65,6 +81,9 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\DuplicateFinderForm.resx">
+      <DependentUpon>DuplicateFinderForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -73,6 +92,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -87,6 +107,22 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\folder_add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_explore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="folder_explore.ico" />
+    <None Include="Resources\zoom.png" />
+    <None Include="Resources\information.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

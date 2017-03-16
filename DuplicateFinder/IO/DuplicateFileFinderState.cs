@@ -1,6 +1,6 @@
 ﻿namespace DuplicateFinder.IO
 {
-    public enum DuplicateFinderState
+    public enum DuplicateFileFinderState
     {
         Idle,
         FindingFiles,

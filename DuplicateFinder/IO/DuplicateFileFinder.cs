@@ -9,7 +9,7 @@ using DuplicateFinder.IO.FileEqualityComparers;
 
 namespace DuplicateFinder.IO
 {
-    public class DuplicateFinder
+    public class DuplicateFileFinder
     {
         private List<FileInfo> _files = new List<FileInfo>();
         private CancellationToken _token;
@@ -24,9 +24,9 @@ namespace DuplicateFinder.IO
 
         public bool IsRunning => _task != null && !_task.IsCompleted;
 
-        public DuplicateFinderState State
+        public DuplicateFileFinderState State
         {
-            get => (DuplicateFinderState)Volatile.Read(ref _state);
+            get => (DuplicateFileFinderState)Volatile.Read(ref _state);
             set
             {
                 Volatile.Write(ref _state, (int)value);
@@ -79,18 +79,18 @@ namespace DuplicateFinder.IO
         {
             try
             {
-                State = DuplicateFinderState.FindingDuplicates;
+                State = DuplicateFileFinderState.FindingDuplicates;
                 new FileInfoEnumerator(this).AddDirectories(dirs);
 
-                State = DuplicateFinderState.SortingFiles;
+                State = DuplicateFileFinderState.SortingFiles;
                 _files.Sort((x, y) => y.Length.CompareTo(x.Length));
 
-                State = DuplicateFinderState.FindingDuplicates;
+                State = DuplicateFileFinderState.FindingDuplicates;
                 FindDuplicates(fileComparer);
             }
             finally
             {
-                State = DuplicateFinderState.Idle;
+                State = DuplicateFileFinderState.Idle;
             }
         }
 
@@ -182,10 +182,10 @@ namespace DuplicateFinder.IO
 
         private struct FileInfoEnumerator
         {
-            private DuplicateFinder _df;
+            private DuplicateFileFinder _df;
             private List<DirectoryInfo> _stack;
 
-            public FileInfoEnumerator(DuplicateFinder df)
+            public FileInfoEnumerator(DuplicateFileFinder df)
             {
                 _df = df;
                 _stack = new List<DirectoryInfo>();
@@ -251,7 +251,7 @@ namespace DuplicateFinder.IO
 
         private struct MultiFileEqualityComparer
         {
-            private DuplicateFinder _df;
+            private DuplicateFileFinder _df;
             private int _start;
             private int _length;
             private IFileEqualityComprarer _fileComparer;
@@ -259,7 +259,7 @@ namespace DuplicateFinder.IO
             private FileStream[] _fs;
             private int _fileStreams;
 
-            public MultiFileEqualityComparer(DuplicateFinder df, int start, int length, IFileEqualityComprarer fileComparer)
+            public MultiFileEqualityComparer(DuplicateFileFinder df, int start, int length, IFileEqualityComprarer fileComparer)
             {
                 _df = df;
                 _start = start;
