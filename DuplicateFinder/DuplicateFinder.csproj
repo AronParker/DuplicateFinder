@@ -134,6 +134,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="folder_explore.ico" />
+    <None Include="Resources\page_gear.png" />
+    <None Include="Resources\page_delete.png" />
+    <None Include="Resources\folder.png" />
+    <None Include="Resources\page.png" />
     <None Include="Resources\zoom.png" />
     <None Include="Resources\information.png" />
   </ItemGroup>

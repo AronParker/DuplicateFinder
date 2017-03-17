@@ -166,17 +166,22 @@ namespace DuplicateFinder.Forms
             if (focused == null)
                 return;
 
-            using (var pidl = ILCreateFromPath(focused.FullName))
+            var hr = SHParseDisplayName(focused.FullName, IntPtr.Zero, out var pidl, 0, IntPtr.Zero);
+
+            if (hr >= 0)
             {
-                var hr = SHOpenFolderAndSelectItems(pidl, 0, IntPtr.Zero, 0);
-
-                if (hr < 0)
+                using (pidl)
                 {
-                    var ex = Marshal.GetExceptionForHR(hr);
+                    hr = SHOpenFolderAndSelectItems(pidl, 0, IntPtr.Zero, 0);
 
-                    MessageBox.Show("Failed to open file location: " + ex.Message, "Failed to open file location", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (hr >= 0)
+                        return;
                 }
             }
+            
+            var ex = Marshal.GetExceptionForHR(hr);
+
+            MessageBox.Show("Failed to open file location: " + ex.Message, "Failed to open file location", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)

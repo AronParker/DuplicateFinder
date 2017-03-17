@@ -38,11 +38,7 @@
             this._typeColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._pathColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._openFileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this._deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._deletePermanentlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._duplicatesLabel = new System.Windows.Forms.Label();
@@ -54,6 +50,10 @@
             this._imageList = new System.Windows.Forms.ImageList(this.components);
             this._errorsLabel = new System.Windows.Forms.Label();
             this._progressLabel = new System.Windows.Forms.Label();
+            this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._openFileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._deletePermanentlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -129,43 +129,13 @@
             this._toolStripSeparator2,
             this._propertiesToolStripMenuItem});
             this._contextMenuStrip.Name = "_contextMenuStrip";
-            this._contextMenuStrip.Size = new System.Drawing.Size(234, 148);
+            this._contextMenuStrip.Size = new System.Drawing.Size(234, 126);
             this._contextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip_Opening);
-            // 
-            // _openToolStripMenuItem
-            // 
-            this._openToolStripMenuItem.Name = "_openToolStripMenuItem";
-            this._openToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this._openToolStripMenuItem.Text = "Open";
-            this._openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
-            // 
-            // _openFileLocationToolStripMenuItem
-            // 
-            this._openFileLocationToolStripMenuItem.Name = "_openFileLocationToolStripMenuItem";
-            this._openFileLocationToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this._openFileLocationToolStripMenuItem.Text = "Open file location";
-            this._openFileLocationToolStripMenuItem.Click += new System.EventHandler(this.OpenFileLocationToolStripMenuItem_Click);
             // 
             // _toolStripSeparator1
             // 
             this._toolStripSeparator1.Name = "_toolStripSeparator1";
             this._toolStripSeparator1.Size = new System.Drawing.Size(230, 6);
-            // 
-            // _deleteToolStripMenuItem
-            // 
-            this._deleteToolStripMenuItem.Name = "_deleteToolStripMenuItem";
-            this._deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this._deleteToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this._deleteToolStripMenuItem.Text = "Delete";
-            this._deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
-            // 
-            // _deletePermanentlyToolStripMenuItem
-            // 
-            this._deletePermanentlyToolStripMenuItem.Name = "_deletePermanentlyToolStripMenuItem";
-            this._deletePermanentlyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Delete)));
-            this._deletePermanentlyToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this._deletePermanentlyToolStripMenuItem.Text = "Delete permanently";
-            this._deletePermanentlyToolStripMenuItem.Click += new System.EventHandler(this.DeletePermanentlyToolStripMenuItem_Click);
             // 
             // _toolStripSeparator2
             // 
@@ -174,6 +144,7 @@
             // 
             // _propertiesToolStripMenuItem
             // 
+            this._propertiesToolStripMenuItem.Image = global::DuplicateFinder.Properties.Resources.page_gear;
             this._propertiesToolStripMenuItem.Name = "_propertiesToolStripMenuItem";
             this._propertiesToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._propertiesToolStripMenuItem.Text = "Properties";
@@ -265,6 +236,41 @@
             this._progressLabel.Size = new System.Drawing.Size(760, 20);
             this._progressLabel.TabIndex = 5;
             this._progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // _openToolStripMenuItem
+            // 
+            this._openToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._openToolStripMenuItem.Image = global::DuplicateFinder.Properties.Resources.page;
+            this._openToolStripMenuItem.Name = "_openToolStripMenuItem";
+            this._openToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this._openToolStripMenuItem.Text = "Open";
+            this._openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+            // 
+            // _openFileLocationToolStripMenuItem
+            // 
+            this._openFileLocationToolStripMenuItem.Image = global::DuplicateFinder.Properties.Resources.folder;
+            this._openFileLocationToolStripMenuItem.Name = "_openFileLocationToolStripMenuItem";
+            this._openFileLocationToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this._openFileLocationToolStripMenuItem.Text = "Open file location";
+            this._openFileLocationToolStripMenuItem.Click += new System.EventHandler(this.OpenFileLocationToolStripMenuItem_Click);
+            // 
+            // _deleteToolStripMenuItem
+            // 
+            this._deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_deleteToolStripMenuItem.Image")));
+            this._deleteToolStripMenuItem.Name = "_deleteToolStripMenuItem";
+            this._deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this._deleteToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this._deleteToolStripMenuItem.Text = "Delete";
+            this._deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
+            // 
+            // _deletePermanentlyToolStripMenuItem
+            // 
+            this._deletePermanentlyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_deletePermanentlyToolStripMenuItem.Image")));
+            this._deletePermanentlyToolStripMenuItem.Name = "_deletePermanentlyToolStripMenuItem";
+            this._deletePermanentlyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Delete)));
+            this._deletePermanentlyToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this._deletePermanentlyToolStripMenuItem.Text = "Delete permanently";
+            this._deletePermanentlyToolStripMenuItem.Click += new System.EventHandler(this.DeletePermanentlyToolStripMenuItem_Click);
             // 
             // DuplicatesForm
             // 

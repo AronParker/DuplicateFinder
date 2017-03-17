@@ -32,6 +32,13 @@ namespace DuplicateFinder
         public static extern SafeItemIDListHandle ILCreateFromPath([MarshalAs(UnmanagedType.LPWStr)] string pszPath);
 
         [DllImport("Shell32.dll", ExactSpelling = true)]
+        public static extern int SHParseDisplayName([MarshalAs(UnmanagedType.LPWStr)] string pszName,
+                                                                     IntPtr pbc,
+                                                                     out SafeItemIDListHandle ppidl,
+                                                                     uint sfgaoIn,
+                                                                     IntPtr psfgaoOut);
+
+        [DllImport("Shell32.dll", ExactSpelling = true)]
         public static extern void ILFree(IntPtr pidl);
 
         [DllImport("Shell32.dll", ExactSpelling = true)]
