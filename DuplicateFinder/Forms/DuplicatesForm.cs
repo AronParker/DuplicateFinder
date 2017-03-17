@@ -87,6 +87,37 @@ namespace DuplicateFinder.Forms
             }
         }
 
+        private void DeleteSelectedFiles(Microsoft.VisualBasic.FileIO.RecycleOption recycle)
+        {
+            var selected = _duplicatesListView.SelectedIndices;
+
+            if (selected.Count == 0)
+                return;
+
+            _duplicatesListView.BeginUpdate();
+
+            try
+            {
+                for (var i = 0; i < selected.Count; i++)
+                {
+                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(((FileInfo)_duplicates[i].Tag).FullName,
+                                                                       Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
+                                                                       recycle,
+                                                                       Microsoft.VisualBasic.FileIO.UICancelOption.DoNothing);
+                    _duplicates.Remove(_duplicates[i]);
+                }
+            }
+            catch (Exception ex) when (ex is IOException ||
+                                       ex is UnauthorizedAccessException ||
+                                       ex is SecurityException)
+            {
+                MessageBox.Show("Failed to delete file permanently: " + ex.Message, "Failed to delete file permanently", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            _duplicatesListView.VirtualListSize = _duplicates.Count;
+            _duplicatesListView.EndUpdate();
+        }
+
         private void DuplicatesListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             e.Item = _duplicates[e.ItemIndex];
@@ -97,16 +128,24 @@ namespace DuplicateFinder.Forms
             e.Item = _errors[e.ItemIndex];
         }
 
-        private void _openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            var selected = _duplicatesListView.FocusedItem?.Tag as FileInfo;
+            var focused = _duplicatesListView.FocusedItem;
 
-            if (selected == null)
+            if (focused == null)
+                e.Cancel = true;
+        }
+
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var focused = _duplicatesListView.FocusedItem?.Tag as FileInfo;
+
+            if (focused == null)
                 return;
 
             try
             {
-                using (Process.Start(selected.FullName))
+                using (Process.Start(focused.FullName))
                 {
                 }
             }
@@ -116,14 +155,14 @@ namespace DuplicateFinder.Forms
             }
         }
 
-        private void _openFileLocationToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenFileLocationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selected = _duplicatesListView.FocusedItem?.Tag as FileInfo;
+            var focused = _duplicatesListView.FocusedItem?.Tag as FileInfo;
 
-            if (selected == null)
+            if (focused == null)
                 return;
 
-            using (var pidl = ILCreateFromPath(selected.FullName))
+            using (var pidl = ILCreateFromPath(focused.FullName))
             {
                 var hr = SHOpenFolderAndSelectItems(pidl, 0, IntPtr.Zero, 0);
 
@@ -136,76 +175,34 @@ namespace DuplicateFinder.Forms
             }
         }
 
-        private void _deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selected = _duplicatesListView.FocusedItem;
-
-            if (selected == null)
-                return;
-
-            try
-            {
-                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(((FileInfo)selected.Tag).FullName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin, Microsoft.VisualBasic.FileIO.UICancelOption.DoNothing);
-            }
-            catch (Exception ex) when (ex is IOException ||
-                                       ex is UnauthorizedAccessException ||
-                                       ex is SecurityException)
-            {
-                MessageBox.Show("Failed to delete file permanently: " + ex.Message, "Failed to delete file permanently", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            _duplicatesListView.BeginUpdate();
-            _duplicates.Remove(selected);
-            _duplicatesListView.VirtualListSize = _duplicates.Count;
-            _duplicatesListView.EndUpdate();
+            DeleteSelectedFiles(Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
         }
 
-        private void _deletePermanentlyToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeletePermanentlyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selected = _duplicatesListView.FocusedItem;
-
-            if (selected == null)
-                return;
-            
-            try
-            {
-                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(((FileInfo)selected.Tag).FullName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.DeletePermanently, Microsoft.VisualBasic.FileIO.UICancelOption.DoNothing);
-            }
-            catch (Exception ex) when (ex is IOException ||
-                                       ex is UnauthorizedAccessException ||
-                                       ex is SecurityException)
-            {
-                MessageBox.Show("Failed to delete file permanently: " + ex.Message, "Failed to delete file permanently", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            
-            _duplicatesListView.BeginUpdate();
-            _duplicates.Remove(selected);
-            _duplicatesListView.VirtualListSize = _duplicates.Count;
-            _duplicatesListView.EndUpdate();
+            DeleteSelectedFiles(Microsoft.VisualBasic.FileIO.RecycleOption.DeletePermanently);
         }
 
-        private void _propertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void PropertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selected = _duplicatesListView.FocusedItem?.Tag as FileInfo;
+            var focused = _duplicatesListView.FocusedItem?.Tag as FileInfo;
 
-            if (selected == null)
+            if (focused == null)
                 return;
 
-            var startInfo = new ProcessStartInfo(selected.FullName);
-            startInfo.Verb = "properties";
-
-            try
+            var shellExecuteInfo = new SHELLEXECUTEINFO()
             {
-                using (Process.Start(startInfo))
-                {
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                MessageBox.Show("Failed to show properties: " + ex.Message, "Failed to show properties", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                cbSize = (uint)Marshal.SizeOf<SHELLEXECUTEINFO>(),
+                lpVerb = "properties",
+                lpFile = focused.FullName,
+                nShow = SW_SHOW,
+                fMask = SEE_MASK_INVOKEIDLIST
+            };
 
-}
+            ShellExecuteEx(ref shellExecuteInfo);
+        }
 
         private class DuplicateFinderTask
         {
@@ -303,7 +300,7 @@ namespace DuplicateFinder.Forms
 
             private void UpdateProgress()
             {
-                var percentage = (double)_finder.ProcessedFiles / _finder.AddedFiles;
+                var percentage = _finder.AddedFiles == 0 ? 1.0 : (double)_finder.ProcessedFiles / _finder.AddedFiles;
                 var processedFiles = _finder.ProcessedFiles;
                 var processedSize = _finder.ProcessedSize;
 

@@ -90,7 +90,7 @@
             this._duplicatesListView.UseCompatibleStateImageBehavior = false;
             this._duplicatesListView.View = System.Windows.Forms.View.Details;
             this._duplicatesListView.VirtualMode = true;
-            this._duplicatesListView.ItemActivate += new System.EventHandler(this._openToolStripMenuItem_Click);
+            this._duplicatesListView.ItemActivate += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             this._duplicatesListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.DuplicatesListView_RetrieveVirtualItem);
             // 
             // _nameColumnHeader
@@ -129,21 +129,22 @@
             this._toolStripSeparator2,
             this._propertiesToolStripMenuItem});
             this._contextMenuStrip.Name = "_contextMenuStrip";
-            this._contextMenuStrip.Size = new System.Drawing.Size(234, 126);
+            this._contextMenuStrip.Size = new System.Drawing.Size(234, 148);
+            this._contextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip_Opening);
             // 
             // _openToolStripMenuItem
             // 
             this._openToolStripMenuItem.Name = "_openToolStripMenuItem";
             this._openToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._openToolStripMenuItem.Text = "Open";
-            this._openToolStripMenuItem.Click += new System.EventHandler(this._openToolStripMenuItem_Click);
+            this._openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
             // _openFileLocationToolStripMenuItem
             // 
             this._openFileLocationToolStripMenuItem.Name = "_openFileLocationToolStripMenuItem";
             this._openFileLocationToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._openFileLocationToolStripMenuItem.Text = "Open file location";
-            this._openFileLocationToolStripMenuItem.Click += new System.EventHandler(this._openFileLocationToolStripMenuItem_Click);
+            this._openFileLocationToolStripMenuItem.Click += new System.EventHandler(this.OpenFileLocationToolStripMenuItem_Click);
             // 
             // _toolStripSeparator1
             // 
@@ -156,7 +157,7 @@
             this._deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this._deleteToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._deleteToolStripMenuItem.Text = "Delete";
-            this._deleteToolStripMenuItem.Click += new System.EventHandler(this._deleteToolStripMenuItem_Click);
+            this._deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // _deletePermanentlyToolStripMenuItem
             // 
@@ -164,7 +165,7 @@
             this._deletePermanentlyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Delete)));
             this._deletePermanentlyToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._deletePermanentlyToolStripMenuItem.Text = "Delete permanently";
-            this._deletePermanentlyToolStripMenuItem.Click += new System.EventHandler(this._deletePermanentlyToolStripMenuItem_Click);
+            this._deletePermanentlyToolStripMenuItem.Click += new System.EventHandler(this.DeletePermanentlyToolStripMenuItem_Click);
             // 
             // _toolStripSeparator2
             // 
@@ -176,7 +177,7 @@
             this._propertiesToolStripMenuItem.Name = "_propertiesToolStripMenuItem";
             this._propertiesToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this._propertiesToolStripMenuItem.Text = "Properties";
-            this._propertiesToolStripMenuItem.Click += new System.EventHandler(this._propertiesToolStripMenuItem_Click);
+            this._propertiesToolStripMenuItem.Click += new System.EventHandler(this.PropertiesToolStripMenuItem_Click);
             // 
             // _duplicatesLabel
             // 

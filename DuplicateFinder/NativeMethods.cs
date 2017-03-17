@@ -8,11 +8,16 @@ namespace DuplicateFinder
     [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods
     {
+        public const uint SEE_MASK_INVOKEIDLIST = 12;
+
         public const uint SHGFI_DISPLAYNAME = 0x00000200;
         public const uint SHGFI_TYPENAME = 0x00000400;
         public const uint SHGFI_SYSICONINDEX = 0x00004000;
 
+        public const int SW_SHOW = 5;
+
         public const uint LVM_SETIMAGELIST = 0x1003;
+
         public const int LVSIL_SMALL = 1;
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
@@ -48,6 +53,9 @@ namespace DuplicateFinder
                                                 IntPtr wParam,
                                                 IntPtr lParam);
 
+        [DllImport("Shell32.dll", EntryPoint = "ShellExecuteExW", SetLastError = true)]
+        public static extern bool ShellExecuteEx(ref SHELLEXECUTEINFO pExecInfo);
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SHFILEINFO
         {
@@ -58,6 +66,31 @@ namespace DuplicateFinder
             public string szDisplayName;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
             public string szTypeName;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SHELLEXECUTEINFO
+        {
+            public uint cbSize;
+            public uint fMask;
+            public IntPtr hwnd;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string lpVerb;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string lpFile;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string lpParameters;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string lpDirectory;
+            public int nShow;
+            public IntPtr hInstApp;
+            public IntPtr lpIDList;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string lpClass;
+            public IntPtr hkeyClass;
+            public uint dwHotKey;
+            public IntPtr hIcon;
+            public IntPtr hProcess;
         }
     }
 }
