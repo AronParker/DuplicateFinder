@@ -26,8 +26,10 @@ namespace DuplicateFinder.Forms
         private const int DirectoryExceptionImageIndex = 0;
         private const int FileExceptionImageIndex = 1;
 
-        private static Color s_color1 = Color.FromArgb(unchecked((int)0xFFFFFFFF));
-        private static Color s_color2 = Color.FromArgb(unchecked((int)0xFFF0F0F0));
+        private static Color s_foreColor1 = Color.FromArgb(unchecked((int)0xFF000000));
+        private static Color s_foreColor2 = Color.FromArgb(unchecked((int)0xFF808080));
+        private static Color s_backColor1 = Color.FromArgb(unchecked((int)0xFFFFFFFF));
+        private static Color s_backColor2 = Color.FromArgb(unchecked((int)0xFFF0F0F0));
 
         private List<ListViewItem> _duplicates = new List<ListViewItem>();
         private List<ListViewItem> _errors = new List<ListViewItem>();
@@ -100,11 +102,13 @@ namespace DuplicateFinder.Forms
             {
                 for (var i = 0; i < selected.Count; i++)
                 {
-                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(((FileInfo)_duplicates[i].Tag).FullName,
+                    var index = selected[i];
+
+                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(((FileInfo)_duplicates[index].Tag).FullName,
                                                                        Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
                                                                        recycle,
                                                                        Microsoft.VisualBasic.FileIO.UICancelOption.DoNothing);
-                    _duplicates.Remove(_duplicates[i]);
+                    _duplicates[index].ForeColor = s_foreColor2;
                 }
             }
             catch (Exception ex) when (ex is IOException ||
@@ -114,8 +118,8 @@ namespace DuplicateFinder.Forms
                 MessageBox.Show("Failed to delete file permanently: " + ex.Message, "Failed to delete file permanently", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            _duplicatesListView.VirtualListSize = _duplicates.Count;
             _duplicatesListView.EndUpdate();
+            _duplicatesListView.SelectedIndices.Clear();
         }
 
         private void DuplicatesListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
@@ -304,18 +308,28 @@ namespace DuplicateFinder.Forms
                 var processedFiles = _finder.ProcessedFiles;
                 var processedSize = _finder.ProcessedSize;
 
-                _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"Processing files... ({processedFiles} files processed, {FileSystem.GetHumanReadableSize((ulong)processedSize)} in total)");
+                _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"Processing files... ({processedFiles} file(s) processed, {FileSystem.GetHumanReadableSize((ulong)processedSize)} in total)");
                 _duplicatesForm._progressBar.Style = ProgressBarStyle.Continuous;
                 _duplicatesForm._progressBar.Value = (int)(percentage * 10000);
             }
 
             private void Finish()
             {
+                var elapsed = DateTimeOffset.UtcNow - _finder.Start;
                 var duplicateFiles = _finder.DuplicateFiles;
                 var duplicatesSize = _finder.DuplicatesSize;
-                var elapsed = DateTimeOffset.UtcNow - _finder.Start;
-                
-                _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"Found {duplicateFiles} duplicates ({FileSystem.GetHumanReadableSize((ulong)duplicatesSize)}) in {elapsed.ToHumanReadableString()}"); ;
+                var processedFiles = _finder.ProcessedFiles;
+                var processedSize = _finder.ProcessedSize;
+
+                if (duplicateFiles > 0)
+                {
+
+                    _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"{duplicateFiles} duplicate(s) found ({FileSystem.GetHumanReadableSize((ulong)duplicatesSize)}) out of {processedFiles} file(s) ({FileSystem.GetHumanReadableSize((ulong)processedSize)}) in {elapsed.ToHumanReadableString()}");
+                }
+                else
+                {
+                    _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"No duplicates found out of {processedFiles} file(s) ({FileSystem.GetHumanReadableSize((ulong)processedSize)}) in {elapsed.ToHumanReadableString()}");
+                }
             }
 
             private class DuplicateFileFinderEx : DuplicateFileFinder
@@ -472,7 +486,8 @@ namespace DuplicateFinder.Forms
                         CurrentSysImageList = sysImageList;
                     }
 
-                    lvi.BackColor = _lastColor ? s_color1 : s_color2;
+                    lvi.ForeColor = s_foreColor1;
+                    lvi.BackColor = _lastColor ? s_backColor1 : s_backColor2;
                     lvi.Tag = fileInfo;
 
                     return lvi;
