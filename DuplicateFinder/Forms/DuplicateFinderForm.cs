@@ -21,6 +21,10 @@ namespace DuplicateFinder.Forms
         {
             InitializeComponent();
             DirectoriesListView_SelectedIndexChanged(this, EventArgs.Empty);
+
+#if DEBUG
+            AddPath(@"C:\Users\Aron\Desktop\1");
+#endif
         }
 
         private void AddPath(string path)

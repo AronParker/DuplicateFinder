@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,15 +12,15 @@ namespace DuplicateFinder.IO
 {
     public class DuplicateFileFinder
     {
-        private List<FileInfo> _files = new List<FileInfo>();
+        protected List<FileInfo> _files = new List<FileInfo>();
+
         private CancellationToken _token;
         private Task _task;
         
         public event FileInfoEventHandler FileAdded;
-        public event EventHandler ProcessingStarted;
-        public event FileInfoEnumerableEventHandler FilesProcessed;
-        public event FileInfoEnumerableEventHandler DuplicateFound;
-        public event ErrorEventHandler Error;
+        public event FileInfoReadOnlyListEventHandler FilesProcessed;
+        public event FileInfoReadOnlyListEventHandler DuplicateFound;
+        public event FileSystemInfoErrorEventHandler Error;
 
         public bool IsRunning => _task != null && !_task.IsCompleted;
 
@@ -48,25 +49,27 @@ namespace DuplicateFinder.IO
             FileAdded?.Invoke(this, new FileInfoEventArgs(file));
         }
 
-        protected virtual void OnFileProcessed(IEnumerable<FileInfo> processed)
+        protected virtual void OnFilesProcessed(int start, int length)
         {
-            FilesProcessed?.Invoke(this, new FileInfoEnumerableEventArgs(processed));
+            var processed = CreateReadOnlyList(start, length);
+            FilesProcessed?.Invoke(this, new FileInfoReadOnlyListEventArgs(processed));
         }
 
-        protected virtual void OnDuplicateFound(IEnumerable<FileInfo> duplicates)
+        protected virtual void OnDuplicateFound(int start, int length)
         {
-            DuplicateFound?.Invoke(this, new FileInfoEnumerableEventArgs(duplicates));
+            var duplicate = CreateReadOnlyList(start, length);
+            DuplicateFound?.Invoke(this, new FileInfoReadOnlyListEventArgs(duplicate));
         }
 
-        protected virtual void OnError(Exception ex)
+        protected virtual void OnError(FileSystemInfoException ex)
         {
-            Error?.Invoke(this, new ErrorEventArgs(ex));
+            Error?.Invoke(this, new FileSystemInfoErrorEventArgs(ex));
         }
 
         private void InternalStart(IEnumerable<DirectoryInfo> dirs, IFileInfoEqualityComparer fileComparer)
         {
+            _files.Clear();
             new FileInfoEnumerator(this).AddDirectories(dirs);
-            ProcessingStarted?.Invoke(this, EventArgs.Empty);
             FindDuplicates(fileComparer);
         }
 
@@ -78,6 +81,8 @@ namespace DuplicateFinder.IO
 
             while (i < _files.Count)
             {
+                _token.ThrowIfCancellationRequested();
+
                 var start = i++;
 
                 while (i < _files.Count && _files[start].Length == _files[i].Length)
@@ -87,6 +92,8 @@ namespace DuplicateFinder.IO
 
                 if (length > 1)
                     FindDuplicates(start, length, fileComparer);
+
+                OnFilesProcessed(start, length);
             }
         }
 
@@ -97,7 +104,7 @@ namespace DuplicateFinder.IO
                 if (length == 2)
                 {
                     if (fileInfoComparer.Equals(_files[start], _files[start + 1]))
-                        MarkAsDuplicates(start, length);
+                        OnDuplicateFound(start, length);
                 }
                 else
                 {
@@ -107,12 +114,10 @@ namespace DuplicateFinder.IO
                         GroupEqualFileInfosAtTop(start, length, fileInfoComparer);
                 }
             }
-            catch (FileException ex)
+            catch (FileSystemInfoException ex)
             {
                 OnError(ex);
             }
-
-            MarkAsProcessed(start, length);
         }
 
         private void GroupEqualFileInfosAtTop(int start, int length, IFileInfoEqualityComparer fileInfoComparer)
@@ -134,28 +139,20 @@ namespace DuplicateFinder.IO
                 }
 
                 if (equalFiles > 1)
-                    MarkAsDuplicates(start + i, equalFiles);
+                    OnDuplicateFound(start + i, equalFiles);
 
                 i += equalFiles;
             }
         }
 
-        private void MarkAsDuplicates(int start, int length)
+        private IReadOnlyList<FileInfo> CreateReadOnlyList(int start, int length)
         {
-            OnDuplicateFound(CreateView(start, length));
-        }
+            var array = new FileInfo[length];
 
-        private void MarkAsProcessed(int start, int length)
-        {
-            OnFileProcessed(CreateView(start, length));
-        }
+            for (var i = 0; i < length; i++)
+                array[i] = _files[i + start];
 
-        private IEnumerable<FileInfo> CreateView(int start, int length)
-        {
-            var maxExclusive = start + length;
-            
-            for (var i = start; i < maxExclusive; i++)
-                yield return _files[i];
+            return array;
         }
 
         private struct FileInfoEnumerator
@@ -176,10 +173,7 @@ namespace DuplicateFinder.IO
                     _df._token.ThrowIfCancellationRequested();
 
                     if (dir == null)
-                    {
-                        _df.OnError(new DirectoryException(dir, new ArgumentNullException()));
                         continue;
-                    }
 
                     _stack.Add(dir);
 
@@ -205,25 +199,24 @@ namespace DuplicateFinder.IO
                 {
                     foreach (var fsi in curDir.EnumerateFileSystemInfos())
                     {
-                        _df._token.ThrowIfCancellationRequested();
-
                         if (fsi is FileInfo file)
-                        {
-                            _df._files.Add(file);
-                            _df.OnFileAdded(file);
-                        }
+                            AddFile(file);
                         else if (fsi is DirectoryInfo dir)
-                        {
                             _stack.Add(dir);
-                        }
                     }
                 }
                 catch (Exception ex) when (ex is IOException ||
                                            ex is UnauthorizedAccessException ||
                                            ex is SecurityException)
                 {
-                    _df.OnError(new DirectoryException(curDir, ex));
+                    _df.OnError(new FileSystemInfoException(curDir, ex));
                 }
+            }
+
+            private void AddFile(FileInfo file)
+            {
+                _df._files.Add(file);
+                _df.OnFileAdded(file);
             }
         }
 
@@ -254,12 +247,12 @@ namespace DuplicateFinder.IO
                 {
                     OpenFiles();
 
-                    for (var i = 0; i < _fileStreams;)
+                    for (var i = 0; (_fileStreams - i) > 1;)
                     {
                         var equalFiles = GetEqualFiles(i);
 
                         if (equalFiles > 1)
-                            _df.MarkAsDuplicates(_start + i, equalFiles);
+                            _df.OnDuplicateFound(_start + i, equalFiles);
 
                         i += equalFiles;
                     }
@@ -279,7 +272,7 @@ namespace DuplicateFinder.IO
                         _fs[i] = FileSystem.OpenFile(_df._files[_start + i]);
                         i++;
                     }
-                    catch (FileException ex)
+                    catch (FileSystemInfoException ex)
                     {
                         _df.OnError(ex);
 
@@ -305,17 +298,16 @@ namespace DuplicateFinder.IO
                     {
                         if (_fileComparer.Equals(f1, fs1, f2, fs2))
                         {
+                            Swap(i + equalFiles, j);
                             equalFiles++;
-
-                            Swap(i, j);
                         }
                     }
-                    catch (FileException ex) when (ex.File == f1)
+                    catch (FileSystemInfoException ex) when (ex.FileSystemInfo == f1)
                     {
                         _df.OnError(ex);
                         break;
                     }
-                    catch (FileException ex) when (ex.File == f2)
+                    catch (FileSystemInfoException ex) when (ex.FileSystemInfo == f2)
                     {
                         _df.OnError(ex);
                         _fileStreams--;

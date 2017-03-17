@@ -17,7 +17,7 @@ namespace DuplicateFinder.IO
                                        ex is UnauthorizedAccessException ||
                                        ex is SecurityException)
             {
-                throw new FileException(file, ex);
+                throw new FileSystemInfoException(file, ex);
             }
         }
 
@@ -31,7 +31,7 @@ namespace DuplicateFinder.IO
                                        ex is UnauthorizedAccessException ||
                                        ex is SecurityException)
             {
-                throw new FileException(file, ex);
+                throw new FileSystemInfoException(file, ex);
             }
         }
         
@@ -51,6 +51,52 @@ namespace DuplicateFinder.IO
 
             if ((attributes & FileAttributes.ReadOnly) != 0)
                 fsi.Attributes = attributes & ~FileAttributes.ReadOnly;
+        }
+
+        public static string GetHumanReadableSize(ulong sizeInBytes)
+        {
+            const ulong BytesPerKilobyte = 1000;
+            const ulong BytesPerMegabyte = BytesPerKilobyte * 1000;
+            const ulong BytesPerGigabyte = BytesPerMegabyte * 1000;
+            const ulong BytesPerTerabyte = BytesPerGigabyte * 1000;
+            const ulong BytesPerPetabyte = BytesPerTerabyte * 1000;
+            const ulong BytesPerExabyte = BytesPerPetabyte * 1000;
+
+            if (sizeInBytes < BytesPerKilobyte)
+                return $"{sizeInBytes:D} Byte(s)";
+
+            if (sizeInBytes < BytesPerMegabyte)
+            {
+                var sizeInKB = (double)sizeInBytes / BytesPerKilobyte;
+                return $"{sizeInKB:F2} KB";
+            }
+
+            if (sizeInBytes < BytesPerGigabyte)
+            {
+                var sizeInMB = (double)sizeInBytes / BytesPerMegabyte;
+                return $"{sizeInMB:F2} MB";
+            }
+
+            if (sizeInBytes < BytesPerTerabyte)
+            {
+                var sizeInGB = (double)sizeInBytes / BytesPerGigabyte;
+                return $"{sizeInGB:F2} GB";
+            }
+
+            if (sizeInBytes < BytesPerPetabyte)
+            {
+                var sizeInTB = (double)sizeInBytes / BytesPerTerabyte;
+                return $"{sizeInTB:F2} TB";
+            }
+
+            if (sizeInBytes < BytesPerExabyte)
+            {
+                var sizeInPB = (double)sizeInBytes / BytesPerPetabyte;
+                return $"{sizeInPB:F2} PB";
+            }
+
+            var sizeInEB = (double)sizeInBytes / BytesPerExabyte;
+            return $"{sizeInEB:F2} EB";
         }
     }
 }

@@ -4,13 +4,13 @@ using System.IO;
 
 namespace DuplicateFinder.IO
 {
-    public class FileInfoEnumerableEventArgs : EventArgs
+    public class FileInfoReadOnlyListEventArgs : EventArgs
     {
-        public FileInfoEnumerableEventArgs(IEnumerable<FileInfo> files)
+        public FileInfoReadOnlyListEventArgs(IReadOnlyList<FileInfo> files)
         {
             Files = files;
         }
 
-        public IEnumerable<FileInfo> Files { get; }
+        public IReadOnlyList<FileInfo> Files { get; }
     }
 }

@@ -1,4 +1,4 @@
 ﻿namespace DuplicateFinder.IO
 {
-    public delegate void FileInfoEnumerableEventHandler(object sender, FileInfoEnumerableEventArgs e);
+    public delegate void FileInfoReadOnlyListEventHandler(object sender, FileInfoReadOnlyListEventArgs e);
 }
