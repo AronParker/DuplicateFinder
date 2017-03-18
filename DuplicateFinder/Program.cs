@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using DuplicateFinder.Forms;
+using static DuplicateFinder.NativeMethods;
 
 namespace DuplicateFinder
 {

@@ -23,20 +23,67 @@ namespace DuplicateFinder.Forms
             DirectoriesListView_SelectedIndexChanged(this, EventArgs.Empty);
 
 #if DEBUG
-            AddPath(@"C:\Users\Aron\Desktop\1");
+            AddDirectory(new DirectoryInfo(@"C:\Users\Aron\Desktop\1"));
 #endif
         }
-
-        private void AddPath(string path)
+        
+        protected override void OnDragEnter(DragEventArgs drgevent)
         {
-            var dir = new DirectoryInfo(path);
-            var lvi = new ListViewItem(new[] { dir.Name, dir.FullName }, 0)
+            if (drgevent.Data.GetDataPresent(DataFormats.FileDrop))
+                drgevent.Effect = DragDropEffects.Link;
+        }
+
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            _directoriesListView.BeginUpdate();
+
+            foreach (var path in (string[])drgevent.Data.GetData(DataFormats.FileDrop))
+                if (Directory.Exists(path))
+                    AddDirectory(new DirectoryInfo(path));
+
+            _directoriesListView.EndUpdate();
+        }
+
+        private void AddDirectory(DirectoryInfo newDir)
+        {
+            if (DirectoryAlreadyCovered(newDir))
             {
-                Tag = dir
+                MessageBox.Show("The folder you selected is already contained within another folder that is already added. Please remove the existing folder first or select a folder outside of the existing folders.",
+                                "Invalid folder",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+
+            RemoveDirectoriesThatThisCovers(newDir);
+
+            var lvi = new ListViewItem(new[] { newDir.Name, newDir.FullName }, 0)
+            {
+                Tag = newDir
             };
 
             _directoriesListView.Items.Add(lvi);
             _findButton.Enabled = true;
+        }
+
+        private bool DirectoryAlreadyCovered(DirectoryInfo newDir)
+        {
+            foreach (var dir in _directoriesListView.Items.Cast<ListViewItem>().Select(x => (DirectoryInfo)x.Tag))
+                if (newDir.FullName.StartsWith(dir.FullName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+            return false;
+        }
+
+        private void RemoveDirectoriesThatThisCovers(DirectoryInfo newDir)
+        {
+            foreach (var item in _directoriesListView.Items.Cast<ListViewItem>())
+            {
+                var dir = (DirectoryInfo)item.Tag;
+
+                if (dir.FullName.StartsWith(newDir.FullName, StringComparison.OrdinalIgnoreCase))
+                    item.Remove();
+            }
         }
 
         private void RemoveSelectedDirectories()
@@ -68,7 +115,7 @@ namespace DuplicateFinder.Forms
             }
         }
 
-        private void DirectoriesListView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void DirectoriesListView_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Delete)
                 RemoveSelectedDirectories();
@@ -76,12 +123,21 @@ namespace DuplicateFinder.Forms
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            using (var fbd = new FolderBrowserDialog())
-            {
-                if (fbd.ShowDialog() != DialogResult.OK)
-                    return;
+            var fbd = new IFileOpenDialog();
+            fbd.SetOptions(FOS.PICKFOLDERS | FOS.FORCEFILESYSTEM | FOS.ALLOWMULTISELECT | FOS.PATHMUSTEXIST | FOS.FILEMUSTEXIST);
+            var hr = fbd.Show(Handle);
 
-                AddPath(fbd.SelectedPath);
+            if (hr >= 0)
+            {
+                fbd.GetResults(out var results);
+                results.GetCount(out var count);
+
+                for (var i = 0U; i < count; i++)
+                {
+                    results.GetItemAt(i, out var si);
+                    si.GetDisplayName(SIGDN.FILESYSPATH, out var fullPath);
+                    AddDirectory(new DirectoryInfo(fullPath));
+                }
             }
         }
 

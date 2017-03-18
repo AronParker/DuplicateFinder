@@ -62,7 +62,7 @@
             this._directoriesListView.View = System.Windows.Forms.View.Details;
             this._directoriesListView.ItemActivate += new System.EventHandler(this.DirectoriesListView_ItemActivate);
             this._directoriesListView.SelectedIndexChanged += new System.EventHandler(this.DirectoriesListView_SelectedIndexChanged);
-            this._directoriesListView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.DirectoriesListView_PreviewKeyDown);
+            this._directoriesListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DirectoriesListView_KeyDown);
             // 
             // _directoryNameColumnHeader
             // 
@@ -152,6 +152,7 @@
             // 
             // DuplicateFinderForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.CausesValidation = false;

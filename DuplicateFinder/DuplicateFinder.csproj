@@ -32,7 +32,7 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>true</Prefer32Bit>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -60,7 +60,6 @@
     </Compile>
     <Compile Include="Extensions\IListEx.cs" />
     <Compile Include="Extensions\StreamEx.cs" />
-    <Compile Include="Extensions\TimeSpanEx.cs" />
     <Compile Include="Forms\DuplicateFinderForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +86,7 @@
     <Compile Include="IO\FileSystemInfoErrorEventArgs.cs" />
     <Compile Include="IO\FileSystemInfoErrorEventHandler.cs" />
     <Compile Include="IO\FileSystemInfoException.cs" />
+    <Compile Include="Localizations\Localization.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
