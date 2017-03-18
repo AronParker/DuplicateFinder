@@ -37,16 +37,16 @@ namespace DuplicateFinder.Forms
         private bool _closeAfterCancellation = false;
 
         private DuplicateFinderTask _duplicateFinderTask;
+        private DirectoryInfo[] _dirs;
         private CancellationTokenSource _cts;
         
-        public DuplicatesForm(DirectoryInfo[] dirs, bool quickScan)
+        public DuplicatesForm(DirectoryInfo[] dirs)
         {
             if (dirs == null)
                 throw new ArgumentNullException(nameof(dirs));
 
             _duplicateFinderTask = new DuplicateFinderTask(this);
-            _duplicateFinderTask.SetDirectories(dirs);
-            _duplicateFinderTask.SetQuickScan(quickScan);
+            _dirs = dirs;            
 
             InitializeComponent();
         }
@@ -61,7 +61,7 @@ namespace DuplicateFinder.Forms
 
         protected override async void OnLoad(EventArgs e)
         {
-            _duplicateFinderTask.Init();
+            _duplicateFinderTask.Init(dirs);
 
             using (_cts = new CancellationTokenSource())
                 await _duplicateFinderTask.RunAsync(_cts.Token);
@@ -226,23 +226,13 @@ namespace DuplicateFinder.Forms
             {
                 _duplicatesForm = duplicatesForm;
                 _finder = new DuplicateFileFinderEx(this);
+                _fileInfoComparer = new DefaultFileEqualityComparer();
             }
 
-            public void SetDirectories(DirectoryInfo[] dirs)
+            public void Init(DirectoryInfo[] dirs)
             {
                 _dirs = dirs;
-            }
 
-            public void SetQuickScan(bool quickScan)
-            {
-                if (quickScan)
-                    _fileInfoComparer = new DefaultFileInfoEqualityComparer();
-                else
-                    _fileInfoComparer = new DefaultFileEqualityComparer();
-            }
-
-            public void Init()
-            {
                 _finder.Init();
             }
 
@@ -321,20 +311,10 @@ namespace DuplicateFinder.Forms
             private void Finish()
             {
                 var elapsed = DateTimeOffset.UtcNow - _finder.Start;
-                var duplicateFiles = _finder.DuplicateFiles;
-                var duplicatesSize = _finder.DuplicatesSize;
                 var processedFiles = _finder.ProcessedFiles;
                 var processedSize = _finder.ProcessedSize;
 
-                if (duplicateFiles > 0)
-                {
-
-                    _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"{duplicateFiles} duplicate(s) found ({FileSystem.GetHumanReadableSize((ulong)duplicatesSize)}) out of {processedFiles} file(s) ({FileSystem.GetHumanReadableSize((ulong)processedSize)}) in {elapsed.ToHumanReadableString()}");
-                }
-                else
-                {
-                    _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"No duplicates found out of {processedFiles} file(s) ({FileSystem.GetHumanReadableSize((ulong)processedSize)}) in {elapsed.ToHumanReadableString()}");
-                }
+                _duplicatesForm._progressLabel.Text = FormattableString.Invariant($"Processed {processedFiles} file(s), {FileSystem.GetHumanReadableSize((ulong)processedSize)} in total in {elapsed.ToHumanReadableString()}");
             }
 
             private class DuplicateFileFinderEx : DuplicateFileFinder

@@ -44,8 +44,11 @@ namespace DuplicateFinder.IO
             const ulong BytesPerPetabyte = BytesPerTerabyte * 1000;
             const ulong BytesPerExabyte = BytesPerPetabyte * 1000;
 
+            if (sizeInBytes == 1)
+                return "1 Byte";
+
             if (sizeInBytes < BytesPerKilobyte)
-                return $"{sizeInBytes:D} Byte(s)";
+                return $"{sizeInBytes:D} Bytes";
 
             if (sizeInBytes < BytesPerMegabyte)
             {

@@ -94,7 +94,7 @@ namespace DuplicateFinder.Forms
         {
             var dirs = _directoriesListView.Items.Cast<ListViewItem>().Select(x => (DirectoryInfo)x.Tag).ToArray();
 
-            using (var duplicatesForm = new DuplicatesForm(dirs, _quickScanCheckBox.Checked))
+            using (var duplicatesForm = new DuplicatesForm(dirs))
                 duplicatesForm.ShowDialog();
         }
 
