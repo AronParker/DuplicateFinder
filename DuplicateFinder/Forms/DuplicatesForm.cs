@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DuplicateFinder.Extensions;
 using DuplicateFinder.IO;
 using DuplicateFinder.IO.FileEqualityComparers;
 using DuplicateFinder.Localizations;
@@ -303,9 +299,15 @@ namespace DuplicateFinder.Forms
 
             private void UpdateProgress()
             {
+                var localizedAddedFiles = Localization.GetPlural(_finder.AddedFiles, "file");
+                var localizedAddedSize = Localization.GetHumanReadableFileSize(_finder.AddedSize);
+                var localizedProcessedFiles = Localization.GetPlural(_finder.ProcessedFiles, "file");
+                var localizedProcessedSize = Localization.GetHumanReadableFileSize(_finder.ProcessedSize);
+
+                _duplicatesForm._progressLabel.Text = $"Processing files... ({localizedProcessedFiles} ({localizedProcessedSize}) processed out of {localizedAddedFiles} ({localizedAddedSize}))";
+
                 var percentage = _finder.AddedFiles == 0 ? 1.0 : (double)_finder.ProcessedFiles / _finder.AddedFiles;
 
-                _duplicatesForm._progressLabel.Text = $"Processing files... ({Localization.GetPlural(_finder.ProcessedFiles, "file")} processed, {Localization.GetHumanReadableFileSize(_finder.ProcessedSize)} in total)";
                 _duplicatesForm._progressBar.Style = ProgressBarStyle.Continuous;
                 _duplicatesForm._progressBar.Value = (int)(percentage * 10000);
             }
@@ -314,7 +316,12 @@ namespace DuplicateFinder.Forms
             {
                 var elapsed = DateTimeOffset.UtcNow - _finder.Start;
 
-                _duplicatesForm._progressLabel.Text = $"Processed {Localization.GetPlural(_finder.ProcessedFiles, "file")} ({Localization.GetHumanReadableFileSize(_finder.ProcessedSize)}) in {Localization.GetHumanReadableTimeSpan(elapsed)}";
+                var localizedDuplicateFiles = Localization.GetPlural(_finder.DuplicateFiles, "duplicate");
+                var localizedDuplicatesSize = Localization.GetHumanReadableFileSize(_finder.DuplicatesSize);
+                var localizedProcessedFiles = Localization.GetPlural(_finder.ProcessedFiles, "file");
+                var localizedProcessedSize = Localization.GetHumanReadableFileSize(_finder.ProcessedSize);
+
+                _duplicatesForm._progressLabel.Text = $"Found {localizedDuplicateFiles} ({localizedDuplicatesSize}) out of {localizedProcessedFiles} ({localizedProcessedSize}) in {Localization.GetHumanReadableTimeSpan(elapsed)}";
             }
 
             private class DuplicateFileFinderEx : DuplicateFileFinder
