@@ -230,7 +230,7 @@ namespace DuplicateFinder.Forms
             {
                 _duplicatesForm = duplicatesForm;
                 _finder = new DuplicateFileFinderEx(this);
-                _fileInfoComparer = new DefaultFileEqualityComparer();
+                _fileInfoComparer = new FileEqualityComparer();
             }
 
             public void Init(DirectoryInfo[] dirs)
@@ -382,13 +382,6 @@ namespace DuplicateFinder.Forms
 
                 protected override void OnDuplicateFound(int start, int length)
                 {
-#if DEBUG
-                    for (var i = start; i < start + length; i++)
-                    {
-                        if (_files[i].Name == "de.png")
-                            System.Diagnostics.Debug.Print("hi");
-                    }
-#endif
                     var maxExclusive = start + length;
 
                     for (var i = start; i < maxExclusive; i++)

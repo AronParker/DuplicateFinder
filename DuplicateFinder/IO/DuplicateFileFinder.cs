@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
@@ -227,7 +228,7 @@ namespace DuplicateFinder.IO
             private int _length;
             private IFileEqualityComprarer _fileComparer;
 
-            private FileStream[] _fs;
+            private FileInfoStream[] _fs;
             private int _fileStreams;
 
             public MultiFileEqualityComparer(DuplicateFileFinder df, int start, int length, IFileEqualityComprarer fileComparer)
@@ -237,7 +238,7 @@ namespace DuplicateFinder.IO
                 _length = length;
                 _fileComparer = fileComparer;
 
-                _fs = new FileStream[length];
+                _fs = new FileInfoStream[length];
                 _fileStreams = _fs.Length;
             }
 
@@ -269,7 +270,7 @@ namespace DuplicateFinder.IO
                 {
                     try
                     {
-                        _fs[i] = FileSystem.OpenFile(_df._files[_start + i]);
+                        _fs[i] = FileEqualityComparer.OpenFile(_df._files[_start + i]);
                         i++;
                     }
                     catch (FileSystemInfoException ex)
@@ -285,18 +286,17 @@ namespace DuplicateFinder.IO
             private int GetEqualFiles(int i)
             {
                 var f1 = GetFileInfo(i);
-                var fs1 = GetFileStream(i);
-
+                var fs1 = GetFileInfoStream(i);
                 var equalFiles = 1;
 
                 for (var j = i + 1; j < _fileStreams; j++)
                 {
                     var f2 = GetFileInfo(j);
-                    var fs2 = GetFileStream(j);
+                    var fs2 = GetFileInfoStream(j);
 
                     try
                     {
-                        if (_fileComparer.Equals(f1, fs1, f2, fs2))
+                        if (_fileComparer.Equals(fs1, fs2))
                         {
                             Swap(i + equalFiles, j);
                             equalFiles++;
@@ -312,8 +312,7 @@ namespace DuplicateFinder.IO
                         _df.OnError(ex);
                         _fileStreams--;
 
-                        if (j != _fileStreams)
-                            Swap(j, _fileStreams);
+                        Swap(j, _fileStreams);
                     }
                 }
 
@@ -327,18 +326,24 @@ namespace DuplicateFinder.IO
                         _fs[i].Dispose();
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private FileInfo GetFileInfo(int index)
             {
                 return _df._files[_start + index];
             }
 
-            private FileStream GetFileStream(int index)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private FileInfoStream GetFileInfoStream(int index)
             {
                 return _fs[index];
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void Swap(int i, int j)
             {
+                if (i == j)
+                    return;
+
                 _df._files.Swap(_start + i, _start + j);
                 _fs.Swap(i, j);
             }
