@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using static System.FormattableString;
 
 namespace DuplicateFinder.Localizations
 {
@@ -20,7 +15,7 @@ namespace DuplicateFinder.Localizations
             if (count == 1)
                 return "1 " + word;
 
-            return count.ToString(NumberFormatInfo.InvariantInfo) + " " + word + "s";
+            return Invariant($"{count} {word}s");
         }
 
         public static string GetPlural(long count, string word)
@@ -33,7 +28,7 @@ namespace DuplicateFinder.Localizations
             if (count == 1)
                 return "1 " + word;
 
-            return count.ToString(NumberFormatInfo.InvariantInfo) + " " + word + "s";
+            return Invariant($"{count} {word}s");
         }
 
         public static string GetHumanReadableFileSize(long sizeInBytes)
@@ -52,40 +47,40 @@ namespace DuplicateFinder.Localizations
                 return "1 Byte";
 
             if (sizeInBytes < BytesPerKilobyte)
-                return sizeInBytes.ToString("D", NumberFormatInfo.InvariantInfo) + " Bytes";
+                return Invariant($"{sizeInBytes:D} Bytes");
 
             if (sizeInBytes < BytesPerMegabyte)
             {
                 var sizeInKB = (double)sizeInBytes / BytesPerKilobyte;
-                return sizeInKB.ToString("F2", NumberFormatInfo.InvariantInfo) + " KB";
+                return Invariant($"{sizeInKB:F2} KB");
             }
 
             if (sizeInBytes < BytesPerGigabyte)
             {
                 var sizeInMB = (double)sizeInBytes / BytesPerMegabyte;
-                return sizeInMB.ToString("F2", NumberFormatInfo.InvariantInfo) + " MB";
+                return Invariant($"{sizeInMB:F2} MB");
             }
 
             if (sizeInBytes < BytesPerTerabyte)
             {
                 var sizeInGB = (double)sizeInBytes / BytesPerGigabyte;
-                return sizeInGB.ToString("F2", NumberFormatInfo.InvariantInfo) + " GB";
+                return Invariant($"{sizeInGB:F2} GB");
             }
 
             if (sizeInBytes < BytesPerPetabyte)
             {
                 var sizeInTB = (double)sizeInBytes / BytesPerTerabyte;
-                return sizeInTB.ToString("F2", NumberFormatInfo.InvariantInfo) + " TB";
+                return Invariant($"{sizeInTB:F2} TB");
             }
 
             if (sizeInBytes < BytesPerExabyte)
             {
                 var sizeInPB = (double)sizeInBytes / BytesPerPetabyte;
-                return sizeInPB.ToString("F2", NumberFormatInfo.InvariantInfo) + " PB";
+                return Invariant($"{sizeInPB:F2} PB");
             }
 
             var sizeInEB = (double)sizeInBytes / BytesPerExabyte;
-            return sizeInEB.ToString("F2", NumberFormatInfo.InvariantInfo) + " EB";
+            return Invariant($"{sizeInEB:F2} EB");
         }
 
         public static string GetHumanReadableTimeSpan(TimeSpan ts)

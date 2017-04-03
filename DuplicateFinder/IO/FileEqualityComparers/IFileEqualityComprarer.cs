@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace DuplicateFinder.IO.FileEqualityComparers
+﻿namespace DuplicateFinder.IO.FileEqualityComparers
 {
     public interface IFileEqualityComprarer : IFileInfoEqualityComparer
     {
