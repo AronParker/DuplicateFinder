@@ -8,15 +8,14 @@ namespace DuplicateFinder.Controls
     {
         public ExplorerListView()
         {
-            DoubleBuffered = true;
-            
+            DoubleBuffered = true;            
         }
 
         protected override void OnHandleCreated(EventArgs e)
         {
-            var hResult = NativeMethods.SetWindowTheme(Handle, "explorer", null);
+            var hr = NativeMethods.SetWindowTheme(Handle, "explorer", null);
 
-            Debug.Assert(hResult == 0);
+            Debug.Assert(hr == 0);
 
             base.OnHandleCreated(e);
         }
